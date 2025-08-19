@@ -9,24 +9,27 @@ on:
 jobs:
   dbt-run:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: 3.10
 
-      - name: Install dbt
+      - name: Install dbt Postgres
         run: pip install dbt-postgres
 
-      - name: Set up dbt profile
+      - name: Set up dbt profiles.yml
         run: |
           mkdir -p ~/.dbt
-          echo "${{ secrets.DBT_PROFILES_YML }}" > ~/.dbt/profiles.yml
+          echo "$DBT_PROFILES_YML" | base64 -d > ~/.dbt/profiles.yml
+        env:
+          DBT_PROFILES_YML: ${{ secrets.DBT_PROFILES_YML }}
 
-      - name: Run dbt debug
+      - name: Debug dbt
         run: |
           cd dbtpractice
           dbt debug
