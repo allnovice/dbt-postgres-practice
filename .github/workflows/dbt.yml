@@ -1,4 +1,4 @@
-    - name: Run dbt debug
+    - name: Set up dbt profile
       run: |
-        cd dbtpractice
-        dbt debug
+        mkdir -p ~/.dbt
+        echo "${{ secrets.DBT_PROFILES_YML }}" > ~/.dbt/profiles.yml
