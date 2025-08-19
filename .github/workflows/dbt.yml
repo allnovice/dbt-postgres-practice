@@ -1,0 +1,53 @@
+name: dbt CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  dbt-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Setup Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      # 3. Install dbt for Postgres
+      - name: Install dbt
+        run: pip install dbt-postgres
+
+      # 4. Create dbt profiles.yml using Neon secret
+      - name: Setup dbt profile
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml <<EOL
+          dbtpractice:
+            target: dev
+            outputs:
+              dev:
+                type: postgres
+                threads: 4
+                host: $(echo ${{ secrets.POSTGRES_URL }} | sed -E 's#.*@([^:/]+):.*#\1#')
+                user: $(echo ${{ secrets.POSTGRES_URL }} | sed -E 's#postgresql://([^:]+):.*#\1#')
+                password: $(echo ${{ secrets.POSTGRES_URL }} | sed -E 's#postgresql://[^:]+:([^@]+)@.*#\1#')
+                port: 5432
+                dbname: $(echo ${{ secrets.POSTGRES_URL }} | sed -E 's#.*/([^?]+)\?.*#\1#')
+                schema: public
+                sslmode: require
+          EOL
+
+      # 5. Run dbt commands
+      - name: Run dbt
+        run: |
+          dbt debug
+          dbt run
+          dbt test
