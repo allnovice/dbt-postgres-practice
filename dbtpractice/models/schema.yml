@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: orders
+    description: "Raw seed data from CSV"
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_orders
+    description: "Cleaned-up version of orders"
+    columns:
+      - name: order_date
+        tests:
+          - not_null
+
+  - name: daily_sales
+    description: "Aggregated daily sales metrics"
+    columns:
+      - name: order_date
+        tests:
+          - not_null
+      - name: total_sales
+      - name: num_orders
+
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: orders
+        loaded_at_field: "order_date::timestamp"
+        freshness:
+          warn_after: {count: 1, period: day}
+          error_after: {count: 2, period: day}

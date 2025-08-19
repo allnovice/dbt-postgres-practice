@@ -1,0 +1,6 @@
+order_id,customer_name,order_date,amount,status
+11,Kevin,2024-01-22,330.00,shipped
+12,Lisa,2024-01-23,145.75,pending
+13,Michael,2024-01-24,520.00,shipped
+14,Nina,2024-01-25,275.50,shipped
+15,Oscar,2024-01-26,410.25,pending
