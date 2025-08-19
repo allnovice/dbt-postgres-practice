@@ -1,4 +1,32 @@
-    - name: Set up dbt profile
-      run: |
-        mkdir -p ~/.dbt
-        echo "${{ secrets.DBT_PROFILES_YML }}" > ~/.dbt/profiles.yml
+name: dbt CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  dbt-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dbt
+        run: pip install dbt-postgres
+
+      - name: Set up dbt profile
+        run: |
+          mkdir -p ~/.dbt
+          echo "${{ secrets.DBT_PROFILES_YML }}" > ~/.dbt/profiles.yml
+
+      - name: Run dbt debug
+        run: |
+          cd dbtpractice
+          dbt debug
