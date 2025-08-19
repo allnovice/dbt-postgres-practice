@@ -32,4 +32,4 @@ jobs:
       - name: Run dbt models
         run: |
           cd dbtpractice
-          dbt run
+          dbt seed
